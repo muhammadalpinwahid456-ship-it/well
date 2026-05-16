@@ -40,22 +40,16 @@
    pointer-events: none saat tidak aktif agar chat tetap bisa dipakai
 */
 #doodleOverlay {
-    /* === KUNCI FIX SCROLL BUG ===
-       position:absolute + inset:0 membuat overlay menempel TEPAT di dalam
-       #chatWindow (position:relative), bukan di body/viewport.
-       Karena overlay adalah SIBLING dari .messages-area (bukan child-nya),
-       scroll di .messages-area tidak mempengaruhi overlay sama sekali. */
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
+    position: absolute; /* menempel di dalam .chat-window (position:relative) */
+    inset: 0;           /* otomatis cover seluruh chat-window, tidak perlu JS positioning */
     z-index: 100;
     display: none;
     pointer-events: none;
     overflow: hidden;
+    /* Tidak perlu top/left/width/height — inset:0 sudah cukup karena
+       .chat-window adalah containing block (position:relative + overflow:hidden).
+       Overlay tidak akan ikut scroll .messages-area karena .messages-area
+       adalah child terpisah, bukan parent dari overlay ini. */
 }
 
 /* Mode aktif (user sedang menggambar) — tampil, blokir interaksi ke bawah */
@@ -86,21 +80,22 @@
 /* Canvas partner: paling bawah, hanya tampil, tidak interaktif */
 #doodlePartnerCanvas {
     position: absolute;
-    top: 0; left: 0;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
     z-index: 1;
-    /* width/height diset via JS (.style.width/height) agar sama persis
-       dengan pixel size canvas, sehingga gambar tidak teregang */
 }
 
 /* Canvas milik sendiri: di atas, interaktif saat mode aktif */
 #doodleMyCanvas {
     position: absolute;
-    top: 0; left: 0;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
     z-index: 2;
     cursor: crosshair;
-    /* width/height diset via JS (.style.width/height) */
 }
 #doodleOverlay.doodle-active #doodleMyCanvas {
     pointer-events: all;

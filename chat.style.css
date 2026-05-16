@@ -294,8 +294,6 @@ body {
     flex-direction: column;
     background: #0d1117;
     min-height: 0;
-    position: relative;  /* wajib: agar #chatWindow tidak bocor ke luar */
-    overflow: hidden;    /* wajib: clip konten termasuk overlay doodle */
 }
 
 .welcome-message {

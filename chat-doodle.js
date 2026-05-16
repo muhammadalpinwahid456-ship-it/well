@@ -66,17 +66,10 @@ const DoodleSystem = (() => {
         return `doodles/${_chatId(_myUid, _partnerId)}/draw_${uid}`;
     }
 
-    // ── AMBIL CONTAINER DOODLE ───────────────────────────────
-    // Overlay dipasang di #chatWindow. Kita paksa position:relative +
-    // overflow:hidden via JS saat runtime agar 100% reliable.
+    // ── AMBIL CHAT-WINDOW (container utama, BUKAN scroll area) ──
     function _getChatWindow() {
-        const el = document.getElementById('chatWindow')
-               || document.querySelector('.chat-window');
-        if (el) {
-            el.style.position = 'relative';
-            el.style.overflow = 'hidden';
-        }
-        return el;
+        return document.getElementById('chatWindow')
+            || document.querySelector('.chat-window');
     }
 
     // ── POSISI OVERLAY ────────────────────────────────────────
@@ -158,27 +151,18 @@ const DoodleSystem = (() => {
     }
 
     // ── CANVAS RESIZE ─────────────────────────────────────────
-    // Canvas pixel size HARUS sama dengan ukuran tampilan CSS-nya.
-    // Kita ukur dari chatWindow.offsetWidth/Height (sudah visible saat openDoodle).
-    // DPR (devicePixelRatio) digunakan agar tajam di layar HiDPI/Retina.
+    // Ukuran canvas = ukuran chatWindow (containing block overlay).
+    // openDoodle() dipanggil setelah chatWindow visible, jadi offsetWidth/Height valid.
     function _resizeCanvases() {
-        if (!_overlay || !_myCanvas) return;
+        if (!_overlay) return;
         const chatWin = _getChatWindow();
         const w = chatWin?.offsetWidth  || 400;
         const h = chatWin?.offsetHeight || 600;
-        const dpr = window.devicePixelRatio || 1;
         [_myCanvas, _partnerCanvas].forEach(c => {
             if (!c) return;
-            // Set ukuran piksel internal = ukuran CSS * DPR
-            c.width  = Math.round(w * dpr);
-            c.height = Math.round(h * dpr);
-            // Set ukuran tampilan CSS = ukuran chatWindow
-            c.style.width  = w + 'px';
-            c.style.height = h + 'px';
+            c.width  = w;
+            c.height = h;
         });
-        // Scale context agar koordinat menggambar tetap pakai satuan CSS pixel
-        _myCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        if (_partnerCtx) _partnerCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
     function _resizeCanvasesKeepContent() {
